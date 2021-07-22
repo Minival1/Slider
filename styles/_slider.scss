@@ -1,0 +1,53 @@
+.slider {
+	overflow: hidden;
+
+	&__content {
+		display: flex;
+		flex-wrap: nowrap;
+		transition: transform 0.5s;
+	}
+
+	&__slide {
+	}
+
+	&-bar {
+		height: 1px;
+		background: $light-blue;
+		position: relative;
+
+		&__fill {
+			background: $blue;
+			position: absolute;
+			top: 0;
+			left: 0;
+			height: 100%;
+			width: 60px;
+		}
+	}
+
+	&-arrow {
+		border: 1px solid $light-blue;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		transition: background 0.3s;
+		width: 60px;
+		height: 60px;
+		cursor: pointer;
+
+		&__icon {
+			width: 20px;
+			height: 20px;
+			stroke: $blue;
+			fill: none;
+		}
+
+		&:hover {
+			background: $light-blue;
+		}
+	}
+
+	&-arrow_left + &-arrow_right {
+		margin-left: 40px;
+	}
+}

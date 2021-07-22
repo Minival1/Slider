@@ -1,0 +1,76 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+@import "global";
+@import "mixins";
+@import "colors";
+@import "slider";
+
+body {
+	font-family: 'Roboto', sans-serif;
+}
+
+.container {
+	width: 1160px;
+	margin: 120px auto 0;
+}
+
+.h1 {
+	font-weight: bold;
+	font-size: 50px;
+	line-height: 60px;
+	color: $blue;
+}
+
+.actual {
+	&__top {
+		margin-bottom: 40px;
+		display: flex;
+		align-items: center;
+	}
+
+	&__bar {
+		margin: 0 40px 0 auto;
+		width: 360px;
+	}
+
+	&__item {
+		display: flex;
+		flex-direction: column;
+		border: 1px solid $light-blue;
+		padding: 20px;
+		//width: 260px;
+		//color: $blue;
+		//& + & {
+		//	margin-left: 40px;
+		//}
+	}
+
+	&__info {
+		& + & {
+			margin-top: 10px;
+		}
+
+		&_img {
+			width: 100%;
+			height: 160px;
+		}
+
+		&_date {
+			font-size: 16px;
+			line-height: 26px;
+			color: rgba($blue, 0.6);
+		}
+
+		&_title {
+			font-size: 16px;
+			line-height: 26px;
+			font-weight: normal;
+			flex-grow: 1;
+		}
+
+		&_descr {
+			font-size: 12px;
+			line-height: 22px
+		}
+	}
+}
