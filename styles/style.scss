@@ -7,11 +7,17 @@
 
 body {
 	font-family: 'Roboto', sans-serif;
+	min-width: 400px;
 }
 
 .container {
 	width: 1160px;
 	margin: 120px auto 0;
+
+	@include media-max(1160px) {
+		width: auto;
+		padding: 0 20px;
+	}
 }
 
 .h1 {
@@ -26,11 +32,21 @@ body {
 		margin-bottom: 40px;
 		display: flex;
 		align-items: center;
+
+		@include media-max(1160px) {
+			flex-direction: column;
+			align-items: flex-start;
+			margin-bottom: 20px;
+		}
 	}
 
 	&__bar {
 		margin: 0 40px 0 auto;
-		width: 360px;
+		max-width: 360px;
+		width: 100%;
+		@include media-max(1160px) {
+			margin: 20px 0;
+		}
 	}
 
 	&__item {
@@ -38,11 +54,6 @@ body {
 		flex-direction: column;
 		border: 1px solid $light-blue;
 		padding: 20px;
-		//width: 260px;
-		//color: $blue;
-		//& + & {
-		//	margin-left: 40px;
-		//}
 	}
 
 	&__info {
@@ -53,6 +64,7 @@ body {
 		&_img {
 			width: 100%;
 			height: 160px;
+			object-fit: cover;
 		}
 
 		&_date {
