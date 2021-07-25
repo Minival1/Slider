@@ -1,13 +1,11 @@
 .slider {
 	overflow: hidden;
+	cursor: grab;
 
 	&__content {
 		display: flex;
 		flex-wrap: nowrap;
-		transition: transform 0.5s;
-	}
-
-	&__slide {
+		will-change: transform;
 	}
 
 	&-bar {

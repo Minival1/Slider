@@ -1,5 +1,7 @@
 import "../styles/style.scss"
 
+import { throttle } from 'throttle-debounce';
+
 // options
 let countShowSlides = 4
 let scrollSlides = 2
@@ -85,7 +87,63 @@ const swipeRight = () => {
 }
 
 function updatePosition() {
-    sliderList.style.transform = `translateX(${position}px)`
+    sliderList.style.transition = "transform 0.2s"
+    sliderList.style.transform = `translate3d(${position}px, 0px, 0px)`
     progressBar.style.width = currentScroll * (100 / countScrolls) + "%"
+    totalScroll = position
+
+    setTimeout(() => {
+        sliderList.style.transition = null
+    }, 200)
 }
 
+let isDraggable = false
+let posScroll = 0
+let totalScroll = 0
+
+let prevPageX = 0
+
+let direction = null
+function isRight(pos) {
+    return prevPageX < pos
+}
+
+slider.addEventListener("mousedown", (e) => {
+    prevPageX = e.pageX
+    isDraggable = true
+    posScroll = 0
+})
+
+slider.addEventListener("mousemove", (e) => {
+    if (isDraggable) {
+        let temp = null
+
+        if (isRight(e.pageX)) {
+            posScroll += 1.5
+            direction = "right"
+        } else {
+            posScroll -= 1.5
+            direction = "left"
+        }
+
+        temp = totalScroll + posScroll
+
+        prevPageX = e.pageX
+        sliderList.style.transform = `translate3d(${temp}px, 0px, 0px)`
+    }
+})
+
+slider.addEventListener("mouseup", (e) => {
+    totalScroll += posScroll
+
+    // если мы проскролили небольшое расстояние, то свайпаем слайдер
+    if (Math.abs(totalScroll) > distanceToScroll / 3) {
+        if (direction == "right") {
+            swipeLeft()
+        } else if (direction == "left") {
+            swipeRight()
+        }
+    }
+
+    isDraggable = false
+})
