@@ -2,6 +2,10 @@ import "../styles/style.scss"
 import {throttle} from "throttle-debounce";
 
 
+function isMobile() {
+    return window.innerWidth < 1060
+}
+
 const init = throttle(200, () => {
     if (window.innerWidth <= 500) {
         initSlider({
@@ -14,7 +18,7 @@ const init = throttle(200, () => {
             scrollSlides: 1,
             spaceBetween: 20
         })
-    } else if (window.innerWidth < 1060) {
+    } else if (isMobile()) {
         initSlider({
             countShowSlides: 3,
             scrollSlides: 2,
@@ -33,7 +37,7 @@ init()
 
 window.addEventListener("resize", init)
 
-function initSlider({countShowSlides = 1, scrollSlides = 1, spaceBetween = 0}) {
+function initSlider({countShowSlides = 1, scrollSlides = 1, spaceBetween = 0, autoplaySpeed = 4000}) {
     // helpers
     let position = 0
     let currentSlide = 0
@@ -48,7 +52,7 @@ function initSlider({countShowSlides = 1, scrollSlides = 1, spaceBetween = 0}) {
     const arrowRight = document.querySelector(".slider-arrow_right")
     const progressBar = document.querySelector(".slider-bar__fill")
 
-// calced values
+    // calced values
     const widthSlide = slider.clientWidth / countShowSlides
     const widthSlideWithSpaceBetween = widthSlide + spaceBetween / countShowSlides
     const distanceToScroll = widthSlideWithSpaceBetween * scrollSlides
@@ -68,6 +72,8 @@ function initSlider({countShowSlides = 1, scrollSlides = 1, spaceBetween = 0}) {
     arrowRight.addEventListener("click", (e) => {
         swipeRight()
     })
+
+    let autoplay = initAutoplay()
 
     const swipeLeft = () => {
         // если при перемещении влево осталось переместить меньше слайдов, чем в конфиге
@@ -114,6 +120,8 @@ function initSlider({countShowSlides = 1, scrollSlides = 1, spaceBetween = 0}) {
     }
 
     function updatePosition() {
+        clearInterval(autoplay)
+
         sliderList.style.transition = "transform 0.3s"
         sliderList.style.transform = `translate3d(${position}px, 0px, 0px)`
         progressBar.style.width = currentScroll * (100 / countScrolls) + "%"
@@ -122,71 +130,120 @@ function initSlider({countShowSlides = 1, scrollSlides = 1, spaceBetween = 0}) {
         setTimeout(() => {
             sliderList.style.transition = null
         }, 300)
+
+        autoplay = initAutoplay()
     }
 
-    // function initAutoplay(ms = 4000) {
-    //     const interval = setInterval(() => {
-    //         swipeRight()
-    //     }, ms)
-    //
-    //     return interval
-    // }
-    //
-    // let autoplay = initAutoplay()
+    function initAutoplay(ms = autoplaySpeed) {
+        const interval = setInterval(() => {
+            swipeRight()
+        }, ms)
+
+        return interval
+    }
 
     let isDraggable = false
     let posScroll = 0
     let totalScroll = 0
-
     let prevPageX = 0
-
     let direction = null
 
     function isRight(pos) {
         return prevPageX < pos
     }
 
-    slider.addEventListener("mousedown", (e) => {
-        clearInterval(autoplay)
-
-        prevPageX = e.pageX
-        isDraggable = true
-        posScroll = 0
-    })
-
-    slider.addEventListener("mousemove", (e) => {
-        if (isDraggable) {
-            let temp = null
-
-            if (isRight(e.pageX)) {
-                posScroll += 1.5
-                direction = "right"
-            } else {
-                posScroll -= 1.5
-                direction = "left"
-            }
-
-            temp = totalScroll + posScroll
+    function initDragDesktop() {
+        slider.addEventListener("mousedown", (e) => {
+            clearInterval(autoplay)
 
             prevPageX = e.pageX
-            sliderList.style.transform = `translate3d(${temp}px, 0px, 0px)`
-        }
-    })
+            isDraggable = true
+            posScroll = 0
 
-    slider.addEventListener("mouseup", (e) => {
-        autoplay = initAutoplay()
+        })
 
-        totalScroll += posScroll
+        slider.addEventListener("mousemove", (e) => {
+            if (isDraggable) {
+                let temp = null
 
-        // если мы проскролили небольшое расстояние, то свайпаем слайдер
-        if (Math.abs(totalScroll) > distanceToScroll / 3) {
-            if (direction == "right") {
-                swipeLeft()
-            } else if (direction == "left") {
-                swipeRight()
+                if (isRight(e.pageX)) {
+                    posScroll += 1.5
+                    direction = "right"
+                } else {
+                    posScroll -= 1.5
+                    direction = "left"
+                }
+
+                temp = totalScroll + posScroll
+
+                prevPageX = e.pageX
+                sliderList.style.transform = `translate3d(${temp}px, 0px, 0px)`
             }
-        }
+        })
 
-        isDraggable = false
-    })
+        slider.addEventListener("mouseup", (e) => {
+            autoplay = initAutoplay()
+
+            totalScroll += posScroll
+
+            // если мы проскролили небольшое расстояние, то свайпаем слайдер
+            if (Math.abs(totalScroll) > distanceToScroll / 3) {
+                if (direction == "right") {
+                    swipeLeft()
+                } else if (direction == "left") {
+                    swipeRight()
+                }
+            }
+
+            isDraggable = false
+        })
+    }
+
+    function initDragMobile() {
+        slider.addEventListener("touchstart", (e) => {
+            clearInterval(autoplay)
+            prevPageX = e.touches[0].pageX
+            isDraggable = true
+            posScroll = 0
+        })
+
+        slider.addEventListener("touchmove", (e) => {
+            if (isDraggable) {
+                let temp = null
+
+                if (isRight(e.touches[0].pageX)) {
+                    posScroll += 4
+                    direction = "right"
+                } else {
+                    posScroll -= 4
+                    direction = "left"
+                }
+
+                temp = totalScroll + posScroll
+
+                prevPageX = e.touches[0].pageX
+                sliderList.style.transform = `translate3d(${temp}px, 0px, 0px)`
+            }
+        })
+
+        slider.addEventListener("touchend", (e) => {
+            autoplay = initAutoplay()
+
+            totalScroll += posScroll
+
+            // если мы проскролили небольшое расстояние, то свайпаем слайдер
+            if (Math.abs(totalScroll) > distanceToScroll / 2) {
+                if (direction == "right") {
+                    swipeLeft()
+                } else if (direction == "left") {
+                    swipeRight()
+                }
+            }
+
+            isDraggable = false
+        })
+    }
+
+    initDragDesktop()
+    initDragMobile()
 }
